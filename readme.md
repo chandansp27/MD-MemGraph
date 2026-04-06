@@ -66,6 +66,21 @@ Another atomic concept connected to the first.
 
 Full reference: [CLI Reference](example_docs/cli-reference.md)
 
+## CLI + Bash Traversal
+
+Use the graph CLI for node-aware navigation, and use shell tools for quick scans.
+
+```bash
+# quick node listing
+grep '^## ' example_docs/*.md
+
+# quick link extraction
+grep -Rho '\]\([^)]*\.md#[^)]*\)' example_docs/
+
+# topic search across docs
+grep -Ril 'attention' example_docs/
+```
+
 ## Documentation
 
 The `example_docs/` directory contains the full knowledge base:
@@ -79,7 +94,7 @@ The `example_docs/` directory contains the full knowledge base:
 
 ## For AI Agents
 
-See [.agents/skills/md-graph/SKILL.md](.agents/skills/md-graph/SKILL.md) for agent-specific instructions on integrating this knowledge graph.
+See [.agents/skills/md-graph/SKILL.md](.agents/skills/md-graph/SKILL.md) for agent-specific instructions and complementary CLI + grep usage patterns.
 
 ## Project Structure
 

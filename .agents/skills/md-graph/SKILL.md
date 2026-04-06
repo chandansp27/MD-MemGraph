@@ -1,6 +1,6 @@
 ---
 name: md-graph
-description: Write and navigate markdown knowledge graphs. Use when creating blocks in docs/, editing markdown files, or exploring the knowledge graph structure. Blocks are separated by ---, first heading defines the node, standard markdown links create edges.
+description: Write and navigate markdown knowledge graphs. Use when creating markdown blocks in a dedicated folder, editing markdown files, or exploring the knowledge graph structure. Blocks are separated by ---, first heading defines the node, standard markdown links create edges.
 ---
 
 # Markdown Knowledge Graph
@@ -38,6 +38,8 @@ More explanation follows.
 
 ## CLI Commands
 
+Set your graph root first. In this repo, use `example_docs/`; in other projects, use your given folder (should be a dedicated folder for this to work).
+
 Show all commands:
 ```bash
 python3 src/mem_graph.py --help
@@ -47,24 +49,45 @@ python3 src/mem_graph.py --help
 
 List block headers in a file:
 ```bash
-python3 src/mem_graph.py --root docs headers --file FILE.md --all
+python3 src/mem_graph.py --root example_docs headers --file FILE.md --all
 ```
 
 View a specific block:
 ```bash
-python3 src/mem_graph.py --root docs view --id file.md#header-slug
-python3 src/mem_graph.py --root docs view --file FILE.md --header "Header Name"
+python3 src/mem_graph.py --root example_docs view --id file.md#header-slug
+python3 src/mem_graph.py --root example_docs view --file FILE.md --header "Header Name"
 ```
 
 Show graph neighbors (connections):
 ```bash
-python3 src/mem_graph.py --root docs graph --header "Concept" --depth 2
+python3 src/mem_graph.py --root example_docs graph --header "Concept" --depth 2
 ```
 
 Validate links and structure:
 ```bash
-python3 src/mem_graph.py --root docs check
+python3 src/mem_graph.py --root example_docs check
 ```
+
+## Complementary Bash Traversal
+
+The graph CLI is best for node-aware navigation; shell tools are great for fast ad-hoc exploration.
+
+List all nodes quickly:
+```bash
+grep '^## ' example_docs/*.md
+```
+
+Find all markdown links:
+```bash
+grep -Rho '\]\([^)]*\.md#[^)]*\)' example_docs/
+```
+
+Find files mentioning a topic:
+```bash
+grep -Ril 'attention' example_docs/
+```
+
+These complement `headers`, `view`, `graph`, and `check` when you want quick text-level scans.
 
 ## Link Resolution
 
@@ -77,11 +100,11 @@ Links resolve as follows:
 
 ## Workflow
 
-1. Run `check` to see current issues: `python3 src/mem_graph.py --root docs check`
-2. Create new concepts as blocks in files under `docs/`
+1. Run `check` to see current issues: `python3 src/mem_graph.py --root example_docs check`
+2. Create new concepts as blocks in files under your root folder (for this repo: `example_docs/`)
 3. Use standard markdown links to connect them
 4. Run `check` again to validate
-5. Use `headers`, `view`, `graph` to explore
+5. Use `headers`, `view`, `graph` to explore, plus `grep` for quick text searches
 
 ## Example
 
@@ -102,5 +125,5 @@ Built on [Attention Mechanisms](#attention-mechanisms).
 
 Then validate:
 ```bash
-python3 src/mem_graph.py --root docs check
+python3 src/mem_graph.py --root example_docs check
 ```
