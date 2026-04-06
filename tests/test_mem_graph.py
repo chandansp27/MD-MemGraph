@@ -12,7 +12,7 @@ from pathlib import Path
 
 
 MEM_GRAPH = ["python3", "src/mem_graph.py"]
-ROOT = ["--root", "docs"]
+ROOT = ["--root", "example_docs"]
 
 
 def run(args: list) -> tuple[int, str, str]:
