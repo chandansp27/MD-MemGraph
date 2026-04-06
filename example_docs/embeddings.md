@@ -1,21 +1,21 @@
-# Embedding Capacity
+## Embedding Capacity
 
 Embeddings compress high-dimensional signals. There is a finite capacity per vector.
-This section [[supports]] the attention-side observations (see [[../docs/attention.md#Attention Limits | related]]).
+This section supports the attention-side observations (see [Attention Limits](./attention.md#attention-limits)).
 
 ---
 
 ## Token Budget
 
 Token budget constraints affect model context and embeddings.
-Links: [[../docs/attention.md::Attention Limits | related]], [[Vector Saturation | related]].
+Links: [Attention Limits](./attention.md#attention-limits), [Vector Saturation](./attention.md#vector-saturation).
 
 ---
 
 ## Positional Bias
 
 Position encodings interact with embeddings in subtle ways.
-Example: see [[../docs/attention.md#Practical Implications | related]].
+Example: see [Practical Implications](./attention.md#practical-implications).
 
 ---
 
@@ -23,28 +23,28 @@ Example: see [[../docs/attention.md#Practical Implications | related]].
 
 When vectors collapse, nearest neighbors become meaningless.
 Countermeasures: regularization and orthogonalization.
-See [[Embedding Capacity | supports]] and [[Optimization | helps]].
+See [Embedding Capacity](#embedding-capacity) and [Optimization](#optimization).
 
 ---
 
 ## Dimensionality
 
 Higher dimensions increase capacity but cost compute.
-See [[Embedding Capacity | supports]].
+See [Embedding Capacity](#embedding-capacity).
 
 ---
 
 ## Optimization
 
 Local optimization tweaks (LR schedules, warmup).
-This links to tests in [[Experiments | related]].
+This links to tests in [Experiments](./attention.md#experiments).
 
 ---
 
 ## Benchmarks
 
 Benchmark notes and references.
-Compare with attention experiments stored in [[../docs/attention.md#Experiments | related]].
+Compare with attention experiments stored in [Experiments](./attention.md#experiments).
 
 ---
 
@@ -53,14 +53,14 @@ Compare with attention experiments stored in [[../docs/attention.md#Experiments 
 Where embeddings are used:
 - search
 - retrieval-augmented generation
-Edge-case: token budget trade-offs -> [[Token Budget | related]].
+Edge-case: token budget trade-offs -> [Token Budget](#token-budget).
 
 ---
 
 ## Limitations
 
 Practical limits: representational interference and dataset bias.
-See [[Nonexistent Concept | mentions]] (forward ref intentionally left unresolved).
+See [Future Work](./attention.md#future-work) for follow-up ideas.
 
 ---
 
