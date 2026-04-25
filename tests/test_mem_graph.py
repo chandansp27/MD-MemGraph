@@ -128,6 +128,29 @@ def test_check_output_has_line_numbers():
     print("PASS: check output has file:line format")
 
 
+def test_check_reports_file_relative_line_numbers():
+    """Test that unresolved links report the real file line, not the block-relative line."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        docs = Path(tmpdir) / "docs"
+        docs.mkdir()
+        (docs / "test.md").write_text("""## First Concept
+
+This block is valid.
+
+---
+
+## Second Concept
+
+This broken link is on line 8: [Missing](./test.md#missing).
+""")
+        code, stdout, stderr = run_in_subprocess(
+            ["python3", "src/mem_graph.py", "--root", str(docs), "check"]
+        )
+        assert code == 1
+        assert "test.md:8" in stderr, stderr
+    print("PASS: check reports file-relative line numbers")
+
+
 def test_view_nonexistent_shows_helpful_message():
     """Test that view shows helpful message for nonexistent block."""
     code, stdout, stderr = run(["view", "--header", "Fake Header That Does Not Exist"])
@@ -199,6 +222,7 @@ if __name__ == "__main__":
         test_nonexistent_shows_similar_suggestions,
         test_errors_go_to_stderr,
         test_check_output_has_line_numbers,
+        test_check_reports_file_relative_line_numbers,
         test_view_nonexistent_shows_helpful_message,
         test_view_shows_connections,
         test_slugify_is_correct,

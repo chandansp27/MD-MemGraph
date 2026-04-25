@@ -106,7 +106,7 @@ def parse_file(path: Path, root: Path) -> list[dict]:
         links_with_lines = extract_links(block)
         raw_links = [target for _, target in links_with_lines]
         link_entries = [
-            {"line": line_num, "target": target}
+            {"line": block_start + line_num - 1, "target": target}
             for line_num, target in links_with_lines
         ]
 

@@ -1,11 +1,11 @@
 ---
-name: md-graph
-description: Write and navigate markdown knowledge graphs. Use when creating markdown blocks in a dedicated folder, editing markdown files, or exploring the knowledge graph structure. Blocks are separated by ---, first heading defines the node, standard markdown links create edges.
+name: markdown-memory-graph
+description: Use when the agent needs lightweight memory across tasks: recall prior notes, preserve important facts or decisions, record semantic connections, add atomic markdown memory blocks, or link related concepts so future agents can navigate them later.
 ---
 
 # Markdown Knowledge Graph
 
-A lightweight filesystem-based knowledge graph using plain markdown blocks and standard links.
+Use this skill when a markdown corpus can help the current task: prior decisions, implementation notes, research findings, project conventions, related files, or reusable context. The goal is fast recall and navigation while the main work continues.
 
 ## Format Rules
 
@@ -15,30 +15,80 @@ A lightweight filesystem-based knowledge graph using plain markdown blocks and s
 - **Link scope**: Links outside code fences only; fenced code blocks are ignored
 - **Node IDs**: Generated as `file.md#header-slug` from heading text
 
+## Retrieval Loop
+
+Start with normal file and text tools. Use the graph CLI when you have a candidate node and want its full block, outgoing links, or backlinks.
+
+```bash
+# Find likely files or nodes.
+rg "topic|symbol|error" docs/
+grep -REIn "topic|symbol|error" docs/
+find docs -type f -name '*.md'
+
+# Inspect headings, nearby lines, or a whole candidate file.
+rg '^## ' docs/
+grep -RIn '^## ' docs/
+sed -n '1,160p' docs/file.md
+nl -ba docs/file.md | sed -n '40,120p'
+
+# Once a candidate node is known, use node-aware views.
+python3 src/mem_graph.py --root docs view --id file.md#node
+python3 src/mem_graph.py --root docs graph --id file.md#node --depth 1
+```
+
+Use `rg` when available because it is fast; `grep`, `find`, `sed`, `nl`, `awk`, and short Python scripts are all fine when they fit the job. Prefer `graph --depth 1` for quick context; go deeper only when the next hop is clearly relevant.
+
 ## Write Markdown
 
-Create new concepts by adding blocks to files in `docs/`:
+Create new concepts by adding atomic blocks to files in your graph root:
 
 ```markdown
 ## Concept Name
 
-Prose explaining the concept. Natural writing first.
-Reference related concepts: [Other Concept](./file.md#other-concept)
-Or link within same file: [Local Concept](#local-concept)
+Natural prose explaining one reusable idea.
+Reference related concepts with standard links: [Other Concept](./file.md#other-concept).
+Link within the same file when appropriate: [Local Concept](#local-concept).
 
-More explanation follows.
+---
+
+## Another Concept
+
+Start the next node after a `---` separator.
 ```
 
-**Tips**:
-- One concept per block
-- Write clear, focused prose (2-5 sentences per paragraph)
-- Use meaningful heading names
-- Link to related concepts naturally
+Good blocks are small enough to retrieve whole and specific enough to be useful later.
+
+**Atomic block rules**:
+- One reusable idea, decision, workflow, or constraint per block
+- Use concrete headings: `Token Refresh Flow`, not `Notes`
+- Keep the block low-to-mid token length: enough detail to be useful, not a transcript or essay
+- Link to nearby concepts instead of duplicating their full explanation
+- Add or update memory only when it is likely to help future work
 - Keep code examples in fenced blocks
+
+## Atomic Block Examples
+
+Example: implementation memory plus a related design memory.
+
+```markdown
+## Token Refresh Flow
+
+Access tokens expire quickly, so API callers should refresh through the auth client instead of retrying raw requests. The refresh path updates the stored session before the original operation is attempted again.
+
+Related: [Session Storage](./auth.md#session-storage), [API Retry Policy](./api.md#api-retry-policy).
+
+---
+
+## Retrieval Before Traversal
+
+Start with lexical search when the target is unknown, then open the best matching node and inspect direct neighbors. This keeps context small while still using the graph structure when the first result exposes useful adjacent concepts.
+
+Related: [Attention Budget](./agents.md#attention-budget), [Backlinks](./links.md#backlinks).
+```
 
 ## CLI Commands
 
-Set your graph root first. In this repo, use `example_docs/`; in other projects, use your given folder (should be a dedicated folder for this to work).
+Set your graph root first. In this repo, use `example_docs/`; in other projects, use the dedicated folder for the corpus.
 
 Show all commands:
 ```bash
@@ -60,7 +110,7 @@ python3 src/mem_graph.py --root example_docs view --file FILE.md --header "Heade
 
 Show graph neighbors (connections):
 ```bash
-python3 src/mem_graph.py --root example_docs graph --header "Concept" --depth 2
+python3 src/mem_graph.py --root example_docs graph --header "Concept" --depth 1
 ```
 
 Validate links and structure:
@@ -68,26 +118,32 @@ Validate links and structure:
 python3 src/mem_graph.py --root example_docs check
 ```
 
+Use `check` after editing graph links, when a link fails to resolve, or before relying on a changed corpus. It does not need to run before every read-only lookup.
+
 ## Complementary Bash Traversal
 
-The graph CLI is best for node-aware navigation; shell tools are great for fast ad-hoc exploration.
+The graph CLI is best for node-aware navigation; shell tools are best for fast ad-hoc exploration.
 
 List all nodes quickly:
 ```bash
-grep '^## ' example_docs/*.md
+rg '^## ' example_docs/
+grep -RIn '^## ' example_docs/
 ```
 
 Find all markdown links:
 ```bash
-grep -Rho '\]\([^)]*\.md#[^)]*\)' example_docs/
+rg -o '\]\([^)]*\.md#[^)]*\)' example_docs/
+grep -Roh '\]\([^)]*\.md#[^)]*\)' example_docs/
 ```
 
 Find files mentioning a topic:
 ```bash
+rg -l 'attention' example_docs/
 grep -Ril 'attention' example_docs/
+find example_docs -name '*.md'
 ```
 
-These complement `headers`, `view`, `graph`, and `check` when you want quick text-level scans.
+Use `awk`, `sed`, `nl`, `sort`, `uniq`, or a short Python script for filtering and reshaping results when that is faster than adding a CLI feature.
 
 ## Link Resolution
 
@@ -100,30 +156,8 @@ Links resolve as follows:
 
 ## Workflow
 
-1. Run `check` to see current issues: `python3 src/mem_graph.py --root example_docs check`
-2. Create new concepts as blocks in files under your root folder (for this repo: `example_docs/`)
-3. Use standard markdown links to connect them
-4. Run `check` again to validate
-5. Use `headers`, `view`, `graph` to explore, plus `grep` for quick text searches
-
-## Example
-
-```markdown
-## Attention Mechanisms
-
-Attention allows models to focus on relevant parts of sequences.
-See [Transformer Architecture](#transformer) for implementation details.
-Compare to [RNN Approaches](./other.md#rnns).
-
----
-
-## Transformer Architecture
-
-Uses attention layers exclusively for sequential processing.
-Built on [Attention Mechanisms](#attention-mechanisms).
-```
-
-Then validate:
-```bash
-python3 src/mem_graph.py --root example_docs check
-```
+1. Search with shell tools for candidate terms, files, or headings
+2. Use `view` to read the most relevant block once you know its ID or file/header
+3. Use `graph --depth 1` to inspect direct outgoing links and backlinks
+4. Add or update an atomic block only when the new context is reusable
+5. Run `check` after link edits or when validation matters
