@@ -1,8 +1,7 @@
 ---
-
-## name: mem-graph
-
-description: Use when the agent needs lightweight memory across tasks: recall prior notes, preserve important facts or decisions, record semantic connections, add atomic markdown memory blocks, or link related concepts so future agents can navigate them more efficiently. Use this as a continual memory for the user, project and knowledge base.
+name: markdown-memory-graph
+description: "Use when the agent needs lightweight memory across tasks: recall prior notes, preserve important facts or decisions, record semantic connections, add atomic markdown memory blocks, or link related concepts so future agents can navigate them more efficiently. Use this as a continual memory for the user, project and knowledge base."
+---
 
 # Markdown Memory and Knowledge Graph
 
@@ -171,4 +170,3 @@ Links resolve as follows:
 3. Use `graph --depth 1` to inspect direct outgoing links and backlinks
 4. Add or update an atomic block only when the new context is reusable
 5. Run `check` after link edits or when validation matters
-
