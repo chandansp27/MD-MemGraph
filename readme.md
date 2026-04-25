@@ -1,31 +1,35 @@
 # mem-graph
 
-A filesystem-based memory and knowledge graph system for AI agents. Build interconnected documentation that agents can query and navigate using standard markdown links.
+A lightweight markdown memory graph for AI agents. Use plain files, atomic blocks, and standard links to preserve reusable context and semantic connections while staying easy to search with normal shell tools.
 
 ## Overview
 
-fs-memory treats your documentation as a knowledge graph where:
+mem-graph treats a markdown corpus as a small knowledge graph where:
 
 - **Nodes** are atomic concepts defined by `##` headings in markdown files
 - **Edges** are standard markdown links between concepts
 - **Blocks** are content sections separated by `---`
 
-This gives you a lightweight, plain-text knowledge base that remains human-readable while being machine-queryable.
+This gives agents a plain-text memory that remains human-readable, grep-friendly, and navigable with a small CLI when links and backlinks matter.
 
 ## Quick Start
 
 ```bash
-# Validate your knowledge graph
-python3 src/mem_graph.py --root example_docs check
-
-# List all concepts in a file
+# List concepts in a file
 python3 src/mem_graph.py --root example_docs headers --file overview.md --all
+
+# Search first with normal shell tools
+rg "attention|embedding" example_docs/
+grep -RIn "attention" example_docs/
 
 # View a specific concept
 python3 src/mem_graph.py --root example_docs view --id overview.md#what-is-md-graph
 
-# Explore graph connections
-python3 src/mem_graph.py --root example_docs graph --header "Overview" --depth 2
+# Inspect direct graph connections
+python3 src/mem_graph.py --root example_docs graph --id overview.md#what-is-md-graph --depth 1
+
+# Validate links after edits or when correctness matters
+python3 src/mem_graph.py --root example_docs check
 ```
 
 ## Format
@@ -68,18 +72,28 @@ Full reference: [CLI Reference](example_docs/cli-reference.md)
 
 ## CLI + Bash Traversal
 
-Use the graph CLI for node-aware navigation, and use shell tools for quick scans.
+Use shell tools for first-pass discovery, then use the graph CLI for node-aware navigation.
 
 ```bash
 # quick node listing
+rg '^## ' example_docs/
 grep '^## ' example_docs/*.md
 
 # quick link extraction
+rg -o '\]\([^)]*\.md#[^)]*\)' example_docs/
 grep -Rho '\]\([^)]*\.md#[^)]*\)' example_docs/
 
 # topic search across docs
+rg -l 'attention' example_docs/
 grep -Ril 'attention' example_docs/
+
+# file and line inspection
+find example_docs -type f -name '*.md'
+sed -n '1,160p' example_docs/overview.md
+nl -ba example_docs/overview.md | sed -n '1,120p'
 ```
+
+`rg` is fastest when available. `grep`, `find`, `sed`, `nl`, `awk`, and short scripts are useful companions because the graph is just markdown.
 
 ## Documentation
 
@@ -94,7 +108,9 @@ The `example_docs/` directory contains the full knowledge base:
 
 ## For AI Agents
 
-See [.agents/skills/md-graph/SKILL.md](.agents/skills/md-graph/SKILL.md) for agent-specific instructions and complementary CLI + grep usage patterns.
+Use this as lightweight memory: recall prior context, record reusable decisions or discoveries, and link related concepts so future agents can navigate them. Only write memory when the context is likely to help later work.
+
+See [.agents/skills/md-graph/SKILL.md](.agents/skills/md-graph/SKILL.md) for agent-specific instructions and complementary CLI + shell traversal patterns.
 
 ## Project Structure
 

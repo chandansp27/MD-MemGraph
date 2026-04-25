@@ -1,9 +1,10 @@
 ---
-name: markdown-memory-graph
-description: Use when the agent needs lightweight memory across tasks: recall prior notes, preserve important facts or decisions, record semantic connections, add atomic markdown memory blocks, or link related concepts so future agents can navigate them later.
----
 
-# Markdown Knowledge Graph
+## name: mem-graph
+
+description: Use when the agent needs lightweight memory across tasks: recall prior notes, preserve important facts or decisions, record semantic connections, add atomic markdown memory blocks, or link related concepts so future agents can navigate them more efficiently. Use this as a continual memory for the user, project and knowledge base.
+
+# Markdown Memory and Knowledge Graph
 
 Use this skill when a markdown corpus can help the current task: prior decisions, implementation notes, research findings, project conventions, related files, or reusable context. The goal is fast recall and navigation while the main work continues.
 
@@ -36,7 +37,7 @@ python3 src/mem_graph.py --root docs view --id file.md#node
 python3 src/mem_graph.py --root docs graph --id file.md#node --depth 1
 ```
 
-Use `rg` when available because it is fast; `grep`, `find`, `sed`, `nl`, `awk`, and short Python scripts are all fine when they fit the job. Prefer `graph --depth 1` for quick context; go deeper only when the next hop is clearly relevant.
+Use `rg` when available because it is fast; `grep`, `find`, `sed`, `nl`, `awk`, and short Python scripts are all fine when they fit the job. Prefer `graph --depth 1-2` for quick context; go deeper only when the next hop is clearly relevant.
 
 ## Write Markdown
 
@@ -59,6 +60,7 @@ Start the next node after a `---` separator.
 Good blocks are small enough to retrieve whole and specific enough to be useful later.
 
 **Atomic block rules**:
+
 - One reusable idea, decision, workflow, or constraint per block
 - Use concrete headings: `Token Refresh Flow`, not `Notes`
 - Keep the block low-to-mid token length: enough detail to be useful, not a transcript or essay
@@ -91,6 +93,7 @@ Related: [Attention Budget](./agents.md#attention-budget), [Backlinks](./links.m
 Set your graph root first. In this repo, use `example_docs/`; in other projects, use the dedicated folder for the corpus.
 
 Show all commands:
+
 ```bash
 python3 src/mem_graph.py --help
 ```
@@ -98,22 +101,26 @@ python3 src/mem_graph.py --help
 **Common operations**:
 
 List block headers in a file:
+
 ```bash
 python3 src/mem_graph.py --root example_docs headers --file FILE.md --all
 ```
 
 View a specific block:
+
 ```bash
 python3 src/mem_graph.py --root example_docs view --id file.md#header-slug
 python3 src/mem_graph.py --root example_docs view --file FILE.md --header "Header Name"
 ```
 
 Show graph neighbors (connections):
+
 ```bash
 python3 src/mem_graph.py --root example_docs graph --header "Concept" --depth 1
 ```
 
 Validate links and structure:
+
 ```bash
 python3 src/mem_graph.py --root example_docs check
 ```
@@ -125,18 +132,21 @@ Use `check` after editing graph links, when a link fails to resolve, or before r
 The graph CLI is best for node-aware navigation; shell tools are best for fast ad-hoc exploration.
 
 List all nodes quickly:
+
 ```bash
 rg '^## ' example_docs/
 grep -RIn '^## ' example_docs/
 ```
 
 Find all markdown links:
+
 ```bash
 rg -o '\]\([^)]*\.md#[^)]*\)' example_docs/
 grep -Roh '\]\([^)]*\.md#[^)]*\)' example_docs/
 ```
 
 Find files mentioning a topic:
+
 ```bash
 rg -l 'attention' example_docs/
 grep -Ril 'attention' example_docs/
@@ -161,3 +171,4 @@ Links resolve as follows:
 3. Use `graph --depth 1` to inspect direct outgoing links and backlinks
 4. Add or update an atomic block only when the new context is reusable
 5. Run `check` after link edits or when validation matters
+
